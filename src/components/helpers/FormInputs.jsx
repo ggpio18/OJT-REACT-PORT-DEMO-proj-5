@@ -63,13 +63,13 @@ export const InputSelect = ({ label, onChange = null, ...props }) => {
       <>
         <label
           htmlFor={props.id || props.name}
-          className={meta.touched && meta.error ? "custom error-show" : "custom"}
+          className={meta.touched && meta.error ? "error-msg" : ""}
         >
           {label}
         </label>
         <textarea
           className={
-            meta.touched && meta.error ? `error-show ${className}` : className
+            meta.touched && meta.error ? `error-msg ${className}` : className
           }
           {...field}
           {...props}
@@ -80,7 +80,7 @@ export const InputSelect = ({ label, onChange = null, ...props }) => {
           }}
         ></textarea>
         {meta.touched && meta.error ? (
-          <span className="error-show">{meta.error}</span>
+          <small className="error-msg">{meta.error}</small>
         ) : null}
       </>
     );

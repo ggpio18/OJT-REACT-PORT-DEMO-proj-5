@@ -9,13 +9,12 @@ import ModalDelete from '../../../../partials/modals/ModalDelete'
 import { StoreContext } from '../../../../../store/StoreContext'
 import { setIsActive, setIsAdd, setIsDelete } from '../../../../../store/StoreAction'
 
-const PortfolioTable = ({isLoading, isFetching, portfolio}) => {
+const PortfolioTable = ({isLoading, isFetching, portfolio, setItemEdit}) => {
     const {store, dispatch} = React.useContext(StoreContext)
     const [isArchiving, setIsArchiving] = React.useState(0);
     const [id, setId] = React.useState('');
 
    
-
     let counter = 1;
 
     const handleEdit = (item) => {

@@ -4,13 +4,55 @@ import { LiaTimesSolid } from 'react-icons/lia'
 import { Formik, Form } from 'formik'
 import { InputText, InputTextArea } from '../../../../helpers/FormInputs'
 import SpinnerButton from '../../../../partials/spinners/SpinnerButton'
-import { setIsAdd } from '../../../../../store/StoreAction'
+import { setError, setIsAdd, setMessage, setSuccess } from '../../../../../store/StoreAction'
 import { StoreContext } from '../../../../../store/StoreContext'
+import * as Yup from 'yup'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { queryData } from '../../../../helpers/queryData'
 
-const ModalAddPortfolio = () => {
-    const {dispatch} = React.useContext(StoreContext)
+const ModalAddPortfolio = ({itemEdit}) => {
+    const {store, dispatch} = React.useContext(StoreContext);
     const handleClose = () => dispatch(setIsAdd(false));
-    
+
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: (values) =>
+        queryData(
+            itemEdit ? `/v1/portfolio/${itemEdit.portfolio_aid}` :`/v1/portfolio`,
+            itemEdit ? "put" : "post",
+            values
+        ),
+   
+        onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: ["portfolio"] });
+        if (data.success) {
+            dispatch(setIsAdd(false));
+            dispatch(setSuccess(true));
+            dispatch(setMessage(`Successfuly updated.`));
+        } 
+        else {
+            dispatch(setError(true))
+            dispatch(setMessage(data.error));
+        }
+        },
+    });
+
+    const initVal ={
+        portfolio_title: itemEdit ? itemEdit.portfolio_title : "",
+        portfolio_category: itemEdit ? itemEdit.portfolio_category : "",
+        portfolio_image: itemEdit ? itemEdit.portfolio_image : "",
+        portfolio_description: itemEdit ? itemEdit.portfolio_description : "",
+        portfolio_publish_date: itemEdit ? itemEdit.portfolio_publish_date : "",
+    }
+
+    const yupSchema = Yup.object({
+        portfolio_title: Yup.string().required("Required g"),
+        portfolio_category: Yup.string().required("Required g"),
+        portfolio_image: Yup.string().required("Required g"),
+        portfolio_description: Yup.string().required("Required g"),
+        portfolio_publish_date: Yup.string().required("Required g"),
+    })
+
   return (
     <div>
       <ModalWrapper>
@@ -21,11 +63,11 @@ const ModalAddPortfolio = () => {
                 </div>
                 <div className="modal-body p-4">
                     <Formik
-                        // initialValues={initVal}
-                        // validationSchema={yupSchema}
-                        // onSubmit={async (values) => {
-                        //     mutation.mutate(values)
-                        // }}
+                        initialValues={initVal}
+                        validationSchema={yupSchema}
+                        onSubmit={async (values) => {
+                            mutation.mutate(values)
+                        }}
                     >
                         {(props) => {
                             return (
@@ -33,44 +75,50 @@ const ModalAddPortfolio = () => {
                         <div className='grow overflow-y-auto'>
                             
                         <div className="input-wrap">
-                            <InputTextArea
-                                label="Name"
+                            <InputText
+                                label="Title"
                                 type="text"
-                                name="student_name"
+                                name="portfolio_title"
                             />
                         </div>
 
                         <div className="input-wrap">
                         <InputText
-                                label="Class"
+                                label="Category"
                                 type="text"
-                                name="student_class"
+                                name="portfolio_category"
                             />
                         </div>
-                                
-                                {/* edit here */}
-                       
-
+          
                         <div className="input-wrap">
                         <InputText
-                                label="Age"
-                                type="number"
-                                name="student_age"
+                                label="Image"
+                                type="text"
+                                name="portfolio_image"
                             />
                         </div>
 
                         <div className="input-wrap">
-                        <InputText
-                                label="email"
+                        <InputTextArea
+                                label="Description"
                                 type="text"
-                                name="student_email"
+                                name="portfolio_description"
+                                className='h-[15rem] resize-none'
+                            />
+                        </div>
+
+                        <div className="input-wrap">
+                        <InputText
+                                label="Published Date"
+                                type="text"
+                                name="portfolio_publish_date"
                             />
                         </div>
 
                         </div>
 
                         <div className='form-action'>
-                            <button className='btn btn-form btn--accent' type="submit"> <SpinnerButton/>add</button>
+                            <button className='btn btn-form btn--accent' type="submit"> {mutation.isPending ? <SpinnerButton/> : "Add"}</button>
                             <button className='btn btn-form btn--cancel' type="button" onClick={handleClose} >Cancel</button>
                         </div>
                     </Form>)}}

@@ -8,6 +8,8 @@ import ModalAddPortfolio from './ModalAddPortfolio'
 import useQueryData from '../../../../custom-hook/useQueryData'
 import { setIsAdd } from '../../../../../store/StoreAction'
 import { StoreContext } from '../../../../../store/StoreContext'
+import ModalError from '../../../../partials/modals/ModalError'
+import Toast from '../../../../partials/Toast'
 
 const Portfolio = () => {
     const {store, dispatch} = React.useContext(StoreContext)
@@ -59,14 +61,16 @@ const Portfolio = () => {
                     </button>
                 </div>
                     {/* table here */}
-                    <PortfolioTable  isLoading={isLoading} portfolio={portfolio} isFetching={isFetching}/>
+                    <PortfolioTable  isLoading={isLoading} portfolio={portfolio} isFetching={isFetching} setItemEdit={setItemEdit}/>
             </div>
              {/* database info */}
         </div>
 
         </main>
 
-        {store.isAdd && <ModalAddPortfolio/>}
+        {store.isAdd && <ModalAddPortfolio  itemEdit={itemEdit}/>}
+        {store.success && <Toast/>}
+        {store.error && <ModalError position="center"/>}
     </section>
 
     </>

@@ -6,7 +6,7 @@ import { PiArchive } from "react-icons/pi";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryData } from '../../helpers/queryData';
 import { StoreContext, StoreProvider } from '../../../store/StoreContext';
-import { setIsActive, setSuccess, setMessage } from '../../../store/StoreAction';
+import { setIsActive, setSuccess, setMessage, setError } from '../../../store/StoreAction';
 
 
 const ModalConfirmed = ({position, endpoint, queryKey, isArchiving}) => {
@@ -22,11 +22,11 @@ const ModalConfirmed = ({position, endpoint, queryKey, isArchiving}) => {
 
       if (data.success) {
         dispatch(setIsActive(false))
-        dispatch(setSuccess(false))
-        dispatch(setMessage(`Record successfully ${isArchiving ? "Archived" : "Restored"}.`))
+        dispatch(setSuccess(true))
+        dispatch(setMessage(`Record successfully ${isArchiving ? "Restored" : "Archive"}.`))
       } else {
-        // setIsError(true)
-        // setMessage(data.error)
+        dispatch(setError(true))
+        dispatch(setMessage(data.error))
       }
     
     },
